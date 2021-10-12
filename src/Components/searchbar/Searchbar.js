@@ -2,25 +2,25 @@ import React, {useState} from 'react';
 import { toast } from 'react-toastify';
 import {SearchbarContainer} from './SearchbarStyled';
 
-const initialState = { 
-    imageTag: ''
-};
+// const initialState = { 
+//     imageTag: ''
+// };
 
 const Searchbar = ({onSubmit}) => {
-    const [searchbar, setSearchbar] = useState(initialState);
+    const [searchbar, setSearchbar] = useState('');
 
     const handleNameChange = (e) => {
-        setSearchbar({imageTag: e.currentTarget.value.toLowerCase() });
+        setSearchbar(e.currentTarget.value.toLowerCase());
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(searchbar.imageTag.trim() === '') {
+        if(searchbar.trim() === '') {
             toast.error('Enter an image tag, please.');
             return;
         };
-        onSubmit(searchbar.imageTag);
-        setSearchbar({imageTag: ''});
+        onSubmit(searchbar);
+        setSearchbar('');
     };
 
     return (
@@ -33,7 +33,7 @@ const Searchbar = ({onSubmit}) => {
                     autoFocus
                     placeholder="Search images and photos"
                     name = "imageTag"
-                    value={searchbar.imageTag}
+                    value={searchbar}
                     onChange={handleNameChange}
                 />
                 <button type="submit" className="SearchForm-button">

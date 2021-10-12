@@ -7,30 +7,33 @@ import Button from '../button/Button';
 import Modal from '../modal/Modal';
 import galleryStyle from './ImageGalleryStyled';
 
-const initialState = { 
-    images: [],
-    error: null,
-    status: 'idle',
-    page: 1,
-    isModalOpen: false,
-    targetImg: {}
-};
-
 const ImageGallery = ({image}) => {
-    const [state, setState] = useState(initialState);
-    const {images, error, status, page, isModalOpen, targetImg} = state;
+    const [images, setImages] = useState([]);
+    const [error, setError] = useState(null);
+    const [status, setStatus] = useState('idle');
+    const [page, setPage] = useState(1);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [targetImg, setTargetImg] = useState({});
 
     useEffect(() => {
         if (image) {
-            setState({ status: 'pending', page: 1});
+            setStatus('pending');
+            setPage(1);
 
             galleryAPI
             .fetchGallery(image, page)
-            .then(img => setState((prev)=> 
-                ({images: [...img.hits], status: 'resolved', page: prev.page+1})
-            ))
-            .catch(error => setState({error, status: 'rejected'}));
+            .then(img => {
+                        setImages([...img.hits]);
+                        setStatus('resolved');
+                        setPage(prev => prev+1);
+                    }
+                )
+            .catch(error => {
+                    setError(error);
+                    setStatus('rejected');
+                });
         };
+
     }, [image]);
 
     useEffect(() => {
@@ -42,29 +45,26 @@ const ImageGallery = ({image}) => {
 
     const loadMore = () => {
         const nextImg = image;
+    
         galleryAPI
             .fetchGallery(nextImg, page)
-            .then(img => setState((prev)=> 
-                ({...prev, images: [...prev.images, ...img.hits], status: 'resolved', page: prev.page+1})
-            ));
+            .then(img => {
+                    setImages((prev) => [...prev, ...img.hits]);
+                    setStatus('resolved');
+                    setPage(prev => prev+1);
+                });
     };
 
     const findTargetImg = (e) => {
         const id = e.currentTarget.id;
         const targetElement = images.find((item) => item.id == id);
 
-        setState((prev) => ({
-          ...prev,
-          isModalOpen: !prev.isModalOpen,
-          targetImg: {...targetElement}
-        }));
+        setIsModalOpen((prev) => !prev);
+        setTargetImg({...targetElement});
     };
 
     const toggleModal = () => {
-        setState((prev) => ({
-            ...prev,
-          isModalOpen: !prev.isModalOpen
-        }));
+        setIsModalOpen((prev) => !prev);
     };
 
     if(status === 'idle') {
@@ -82,7 +82,7 @@ const ImageGallery = ({image}) => {
     };
 
     if(status === 'rejected') {
-        return <h3>{error.message}</h3>;
+        return <h3>{error}</h3>;
     };
 
     if(status === 'resolved') {

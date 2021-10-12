@@ -4,22 +4,18 @@ import 'react-toastify/dist/ReactToastify.css';
 import ImageGallery from './imageGallery/ImageGallery';
 import Searchbar from './searchbar/Searchbar';
 
-const initialState = {
-    image: '',
-};
-
 const App = () => {
-    const [app, setApp] = useState(initialState);
+    const [app, setApp] = useState('');
 
     const handleFormSubmit = (imageTag) => {
-        setApp((prev)=>({...prev, image: imageTag}))
+        setApp(imageTag);
     };
 
     return (
         <main>
             <ToastContainer/>
             <Searchbar onSubmit={handleFormSubmit}/>
-            <ImageGallery image={app.image}/>
+            <ImageGallery image={app}/>
         </main>
     );
 };
